@@ -88,7 +88,7 @@ class DebugDrawPlugin extends Phaser.Plugins.ScenePlugin {
       } else {
         disabledInputObjs[disabledInputObjs.length] = obj;
       }
-    } else if (obj.type === 'Layer') {
+    } else if (obj.type === 'Layer' || obj.type === 'Container') {
       Each(obj.list, this.processObj, this, disabledInputObjs, inputObjs, maskObjs, otherObjs, showInput);
     } else {
       otherObjs[otherObjs.length] = obj;
@@ -137,7 +137,8 @@ class DebugDrawPlugin extends Phaser.Plugins.ScenePlugin {
   }
 
   drawObj (obj) {
-    this.dot(obj.x, obj.y);
+    let { tx, ty } = obj.getWorldTransformMatrix();
+    this.dot(tx, ty);
 
     if ('originX' in obj) {
       let { width, height } = obj;
@@ -148,12 +149,12 @@ class DebugDrawPlugin extends Phaser.Plugins.ScenePlugin {
       }
 
       if (width || height) {
-        this.graphic.strokeRect(obj.x - obj.originX * width, obj.y - obj.originY * height, width, height);
+        this.graphic.strokeRect(tx - obj.originX * width, ty - obj.originY * height, width, height);
 
         if (obj.rotation && this.showRotation) {
           const rad = 0.5 * max(width, height);
 
-          this.line(obj.x, obj.y, cos(obj.rotation) * rad, sin(obj.rotation) * rad);
+          this.line(tx, ty, cos(obj.rotation) * rad, sin(obj.rotation) * rad);
         }
       }
     }

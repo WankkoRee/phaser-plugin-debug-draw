@@ -125,7 +125,7 @@ var DebugDrawPlugin = /*@__PURE__*/(function (superclass) {
       } else {
         disabledInputObjs[disabledInputObjs.length] = obj;
       }
-    } else if (obj.type === 'Layer') {
+    } else if (obj.type === 'Layer' || obj.type === 'Container') {
       Each(obj.list, this.processObj, this, disabledInputObjs, inputObjs, maskObjs, otherObjs, showInput);
     } else {
       otherObjs[otherObjs.length] = obj;
@@ -174,7 +174,10 @@ var DebugDrawPlugin = /*@__PURE__*/(function (superclass) {
   };
 
   DebugDrawPlugin.prototype.drawObj = function drawObj (obj) {
-    this.dot(obj.x, obj.y);
+    var ref = obj.getWorldTransformMatrix();
+    var tx = ref.tx;
+    var ty = ref.ty;
+    this.dot(tx, ty);
 
     if ('originX' in obj) {
       var width = obj.width;
@@ -186,12 +189,12 @@ var DebugDrawPlugin = /*@__PURE__*/(function (superclass) {
       }
 
       if (width || height) {
-        this.graphic.strokeRect(obj.x - obj.originX * width, obj.y - obj.originY * height, width, height);
+        this.graphic.strokeRect(tx - obj.originX * width, ty - obj.originY * height, width, height);
 
         if (obj.rotation && this.showRotation) {
           var rad = 0.5 * max(width, height);
 
-          this.line(obj.x, obj.y, cos(obj.rotation) * rad, sin(obj.rotation) * rad);
+          this.line(tx, ty, cos(obj.rotation) * rad, sin(obj.rotation) * rad);
         }
       }
     }
